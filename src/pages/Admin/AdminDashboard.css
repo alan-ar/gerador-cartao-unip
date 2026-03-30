@@ -1,0 +1,263 @@
+.admin-page {
+  min-height: 100vh;
+  padding: 40px 24px;
+  background: var(--bg-gradient);
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+.admin-header {
+  width: 100%;
+  max-width: 1200px;
+  padding: 32px 40px;
+  border-radius: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.admin-icon {
+  width: 48px;
+  height: 48px;
+  color: var(--primary);
+  background: rgba(99, 102, 241, 0.1);
+  padding: 10px;
+  border-radius: 12px;
+}
+
+.header-left h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.header-left p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.admin-content {
+  width: 100%;
+  max-width: 1200px;
+  display: grid;
+  gap: 24px;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 16px;
+  width: fit-content;
+}
+
+.admin-tabs button {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-tabs button.active {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.admin-panel {
+  padding: 32px;
+  border-radius: 24px;
+  min-height: 500px;
+}
+
+.table-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.search-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 400px;
+}
+
+.search-box input {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 0.95rem;
+  width: 100%;
+}
+
+.search-box input:focus {
+  outline: none;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.admin-table th {
+  padding: 16px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.admin-table td {
+  padding: 16px;
+  font-size: 0.95rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar-mini {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-badge.bronze {
+  background: rgba(205, 127, 50, 0.1);
+  color: #cd7f32;
+  border: 1px solid rgba(205, 127, 50, 0.2);
+}
+.status-badge.silver {
+  background: rgba(192, 192, 192, 0.1);
+  color: #c0c0c0;
+  border: 1px solid rgba(192, 192, 192, 0.2);
+}
+.status-badge.gold {
+  background: rgba(255, 215, 0, 0.1);
+  color: #ffd700;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.actions-cell {
+  display: flex;
+  gap: 8px;
+}
+
+.actions-cell button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actions-cell button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.create-code-form {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.create-code-form input {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 14px 20px;
+  color: #fff;
+  width: 100%;
+}
+
+.btn-add-code {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 0 24px;
+  border-radius: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.code-text {
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.state-active {
+  color: var(--success);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.state-inactive {
+  color: var(--danger);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-delete-code {
+  color: #ef4444;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .admin-header {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+  .header-left {
+    flex-direction: column;
+  }
+  .search-box {
+    width: 100%;
+  }
+}

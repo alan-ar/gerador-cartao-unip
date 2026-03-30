@@ -1,0 +1,240 @@
+.historico-container {
+  max-width: 1000px;
+  width: 100%;
+}
+
+.historico-header {
+  padding: 30px;
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 2px;
+}
+
+.title-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.title-icon {
+  color: var(--primary);
+  width: 32px;
+  height: 32px;
+}
+
+.historico-header h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.historico-header p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.historico-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-logout {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-logout:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.btn-export {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-back {
+  background: var(--primary);
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.table-wrapper {
+  border-radius: 0 0 20px 20px;
+  overflow: hidden;
+  padding: 10px;
+}
+
+.historico-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  margin-top: -8px;
+}
+
+.historico-table th {
+  text-align: left;
+  padding: 16px 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+}
+
+.historico-table td {
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.03);
+  vertical-align: middle;
+}
+
+.historico-table td:first-child {
+  border-radius: 12px 0 0 12px;
+}
+.historico-table td:last-child {
+  border-radius: 0 12px 12px 0;
+}
+
+.aluno-name {
+  font-weight: 700;
+  color: #fff;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.aluno-rg {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.badge-matricula {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  font-family: monospace;
+}
+
+.aluno-curso {
+  font-weight: 600;
+  color: #f1f5f9;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.aluno-campus {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.status-cell {
+  text-align: center;
+  padding: 40px !important;
+  color: var(--text-secondary);
+}
+
+.btn-delete {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 8px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.action-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.btn-view {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--primary);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  padding: 8px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-view:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-delete:hover {
+  background: var(--danger);
+  color: white;
+}
+
+.footer-actions {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.link-back {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s ease;
+}
+
+.link-back:hover {
+  color: #fff;
+}
+
+@media (max-width: 800px) {
+  .historico-header {
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+  }
+}

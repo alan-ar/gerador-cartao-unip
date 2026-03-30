@@ -7,16 +7,16 @@ Para habilitar o login via Google em sua aplicação, você deve configurar o **
 1.  Acesse o [Google Cloud Console](https://console.cloud.google.com/).
 2.  Crie um novo projeto (ex: `Gerador Cartão UNIP`).
 3.  Vá em **APIs e Serviços > Tela de permissão OAuth**:
-    *   **User Type**: Externo.
-    *   Preencha o nome do app, e-mail de suporte e dados de contato do desenvolvedor.
-    *   Adicione o escopo `.../auth/userinfo.email` e `.../auth/userinfo.profile`.
+    - **User Type**: Externo.
+    - Preencha o nome do app, e-mail de suporte e dados de contato do desenvolvedor.
+    - Adicione o escopo `.../auth/userinfo.email` e `.../auth/userinfo.profile`.
 4.  Vá em **APIs e Serviços > Credenciais**:
-    *   Clique em **+ Criar Credenciais > ID do cliente OAuth**.
-    *   **Tipo de aplicativo**: Aplicativo da Web.
-    *   **Origens JavaScript autorizadas**: 
-        *   `http://localhost:5173` (para desenvolvimento).
-        *   `https://seu-dominio-producao.vercel.app` (se houver).
-    *   **URIs de redirecionamento autorizados**: Você precisará da "Callback URL" do Supabase (veja passo abaixo).
+    - Clique em **+ Criar Credenciais > ID do cliente OAuth**.
+    - **Tipo de aplicativo**: Aplicativo da Web.
+    - **Origens JavaScript autorizadas**:
+      - `http://localhost:5173` (para desenvolvimento).
+      - `https://seu-dominio-producao.vercel.app` (se houver).
+    - **URIs de redirecionamento autorizados**: Você precisará da "Callback URL" do Supabase (veja passo abaixo).
 5.  **Crie** e copie o **ID do cliente** e o **Segredo do cliente**.
 
 ---
@@ -35,6 +35,7 @@ Para habilitar o login via Google em sua aplicação, você deve configurar o **
 ## 3. Configuração de URL (Supabase)
 
 Ainda no Supabase Dashboard:
+
 1.  Vá em **Authentication > URL Configuration**.
 2.  **Site URL**: URL final da aplicação (ex: `https://gerador-unip.vercel.app`).
 3.  **Redirect URLs**: Adicione `http://localhost:5173/**` para permitir redirecionamentos corretos durante o desenvolvimento local.
@@ -60,6 +61,6 @@ O serviço já está pré-configurado no arquivo `src/services/authService.js`:
 
 ## Problemas Comuns
 
-*   **Error 400: redirect_uri_mismatch**: Verifique se a callback URL do Supabase foi adicionada no Google Cloud Console exatamente como aparece no dashboard.
-*   **O usuário volta deslogado**: Verifique se a URL em `Redirect URLs` (Supabase) inclui o `/**` no final para contextos locais.
-*   **Atraso na Propagação**: Após alterar as configurações no Google Cloud, pode levar alguns minutos para entrar em vigor.
+- **Error 400: redirect_uri_mismatch**: Verifique se a callback URL do Supabase foi adicionada no Google Cloud Console exatamente como aparece no dashboard.
+- **O usuário volta deslogado**: Verifique se a URL em `Redirect URLs` (Supabase) inclui o `/**` no final para contextos locais.
+- **Atraso na Propagação**: Após alterar as configurações no Google Cloud, pode levar alguns minutos para entrar em vigor.

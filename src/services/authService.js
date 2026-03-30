@@ -1,4 +1,3 @@
-import { USER_STATUS } from '@/constants/auth'
 import { supabase } from '@/lib/supabase'
 
 /**
@@ -45,9 +44,9 @@ export const authService = {
       .eq('id', user.id)
       .single()
 
-    // 2. If profile not found (PGRST116), create a default BRONZE one as fallback
-    if (error && error.code === 'PGRST116') {
-      console.warn('Profile not found for user. Creating fallback BRONZE profile...')
+    // 2. Handle Profile Generation
+    if (error && (error.code === 'PGRST116' || error.status === 406)) {
+      console.warn(`Profile missing or inaccessible (Code: ${error.code}). Attempting to create one...`)
       const { data: newProfile, error: createError } = await supabase
         .from('profiles')
         .insert([
@@ -64,18 +63,35 @@ export const authService = {
         .single()
 
       if (createError) {
+        // If conflict (409), it means it exists but we couldn't read it
+        if (createError.code === '23505') {
+          console.debug('Profile already exists. Re-fetching...')
+          const { data: retryProfile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single()
+          return { ...user, ...retryProfile }
+        }
         console.error('Failed to create fallback profile:', createError.message)
-        return user // Return at least the auth user object
+        return { ...user, full_name: user.user_metadata?.full_name }
       }
       return { ...user, ...newProfile }
     }
 
     if (error) {
       console.error('Error fetching profile:', error.message)
-      return user
+      return { ...user, full_name: user.user_metadata?.full_name }
     }
 
-    return { ...user, ...profile }
+    // Ensure full_name is at the top level
+    const mergedProfile = { 
+      ...user, 
+      ...profile,
+      full_name: profile?.full_name || user.user_metadata?.full_name || user.email
+    }
+
+    return mergedProfile
   },
 
 

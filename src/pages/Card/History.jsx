@@ -1,19 +1,19 @@
+import { useStudents } from '@/hooks/useStudents'
+import { authService } from '@/services/authService'
+import { formatDate } from '@/utils/formatters'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   ChevronLeft,
   Calendar as DateIcon,
   Download,
   Eye,
+  LogOut,
   Plus,
   Table,
   Trash2,
-  LogOut,
 } from 'lucide-react'
 import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useStudents } from '@/hooks/useStudents'
-import { formatDate } from '@/utils/formatters'
-import { authService } from '@/services/authService'
 import './History.css'
 
 /**
@@ -21,7 +21,8 @@ import './History.css'
  * Allows exporting to CSV, viewing individual cards, and deleting records.
  */
 const History = () => {
-  const { students, loading, error, fetchStudents, deleteStudent } = useStudents()
+  const { students, loading, error, fetchStudents, deleteStudent } =
+    useStudents()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -155,7 +156,9 @@ const History = () => {
                       <div className="aluno-rg">ID: {student.document_id}</div>
                     </td>
                     <td>
-                      <span className="badge-matricula">{student.registration_id}</span>
+                      <span className="badge-matricula">
+                        {student.registration_id}
+                      </span>
                     </td>
                     <td>
                       <div className="aluno-course">{student.course}</div>

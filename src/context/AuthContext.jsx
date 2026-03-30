@@ -13,30 +13,40 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     /**
      * Centralized auth state handler.
-     * Supabase's onAuthStateChange fires for the initial session as well.
      */
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      // Small delay might be needed for initial redirect persistence in some browsers
       setLoading(true)
+
+      // Safety timeout to prevent infinite loading (5 seconds)
+      const timeoutId = setTimeout(() => {
+        setLoading(false)
+        console.warn('[AuthContext] Loading safety timeout reached.')
+      }, 5000)
 
       try {
         if (session?.user) {
-          console.debug(`[AuthContext] State change: ${event}. User identified: ${session.user.id}`)
+          console.debug(`[AuthContext] Auth event: ${event}`)
           setUser(session.user)
 
-          // Fetch full profile (with lazy creation fallback)
+          // Set temporary profile from metadata to avoid flicker
+          setProfile({
+            ...session.user,
+            full_name: session.user.user_metadata?.full_name || session.user.email,
+          })
+
+          // Fetch full database profile
           const fullProfile = await authService.getProfile()
           setProfile(fullProfile)
         } else {
-          console.debug(`[AuthContext] State change: ${event}. No active session.`)
           setUser(null)
           setProfile(null)
         }
       } catch (error) {
-        console.error(`[AuthContext] Unexpected error during state change (${event}):`, error)
+        console.error(`[AuthContext] Fatal auth state error:`, error)
       } finally {
+        clearTimeout(timeoutId)
         setLoading(false)
       }
     })
@@ -45,9 +55,30 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
 
+  /**
+   * Refreshes the user profile from the database.
+   * Useful after status-changing events like code validation.
+   */
+  const refreshProfile = async () => {
+    setLoading(true)
+    try {
+      const fullProfile = await authService.getProfile()
+      setProfile(fullProfile)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const loginWithGoogle = () => authService.loginWithGoogle()
   const logout = () => authService.logout()
-  const validateCode = (code) => authService.validateSecretCode(code)
+  
+  const validateCode = async (code) => {
+    const result = await authService.validateSecretCode(code)
+    // IMPORTANT: After validating, we must refresh to see the NEW status (SILVER)
+    await refreshProfile()
+    return result
+  }
+
 
   // Computando permissões de forma centralizada usando as constantes
   const isAdmin = profile?.role === USER_ROLES.ADMIN

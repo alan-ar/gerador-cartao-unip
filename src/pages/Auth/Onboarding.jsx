@@ -13,6 +13,18 @@ function Onboarding() {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
+  const handleLogout = async () => {
+    setLoading(true)
+    try {
+      await logout()
+      navigate('/login', { replace: true })
+    } catch (err) {
+      console.error('Logout error:', err)
+      setError('Falha ao sair da conta. Tente novamente.')
+      setLoading(false)
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!accepted) {
@@ -112,7 +124,12 @@ function Onboarding() {
           </div>
 
           <div className="onboarding-actions">
-            <button type="button" className="btn-secondary" onClick={logout}>
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={handleLogout}
+              disabled={loading}
+            >
               Sair da Conta
             </button>
             <button type="submit" className="btn-primary" disabled={loading}>

@@ -9,12 +9,24 @@ import {
   Trash2,
   Users,
   XCircle,
+  Award,
+  ShieldCheck,
+  UserMinus,
+  Download,
 } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { formatDate } from '@/utils/formatters'
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
+import { profileService } from '@/services/profileService'
+import { secretCodeService } from '@/services/secretCodeService'
 import { supabase } from '@/lib/supabase'
 import './AdminDashboard.css'
 
+/**
+ * Administrative dashboard for managing users and secret codes.
+ * Uses the profileService and secretCodeService to maintain the service layer architecture.
+ */
 function AdminDashboard() {
   const { logout } = useAuth()
   const [users, setUsers] = useState([])
@@ -31,25 +43,14 @@ function AdminDashboard() {
   const fetchData = async () => {
     setLoading(true)
     try {
-      // 1. Buscar Usuários (Profiles)
-      const { data: profiles, error: userError } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (userError) throw userError
+      const [profiles, secretCodes] = await Promise.all([
+        profileService.getAll(),
+        secretCodeService.getAll(),
+      ])
       setUsers(profiles)
-
-      // 2. Buscar Códigos Secretos
-      const { data: secretCodes, error: codeError } = await supabase
-        .from('secret_codes')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (codeError) throw codeError
       setCodes(secretCodes)
     } catch (err) {
-      console.error('Erro ao buscar dados do admin:', err)
+      console.error('Error fetching admin data:', err)
     } finally {
       setLoading(false)
     }
@@ -57,29 +58,14 @@ function AdminDashboard() {
 
   const handleCreateCode = async (e) => {
     e.preventDefault()
-    if (!newCode) return
+    if (!newCode.trim()) return
 
     try {
       const {
         data: { user },
       } = await supabase.auth.getUser()
 
-      // 1. Desativar todos os códigos anteriores (conforme regra do usuário)
-      await supabase
-        .from('secret_codes')
-        .update({ is_active: false })
-        .eq('is_active', true)
-
-      // 2. Inserir o novo código mestre
-      const { error } = await supabase.from('secret_codes').insert([
-        {
-          code: newCode.toUpperCase(),
-          created_by: user.id,
-          is_active: true,
-        },
-      ])
-
-      if (error) throw error
+      await secretCodeService.create(newCode, user.id)
       setNewCode('')
       fetchData()
     } catch (err) {
@@ -90,28 +76,19 @@ function AdminDashboard() {
   const handleDeleteCode = async (id) => {
     if (!confirm('Tem certeza que deseja excluir este código?')) return
     try {
-      const { error } = await supabase
-        .from('secret_codes')
-        .delete()
-        .eq('id', id)
-      if (error) throw error
+      await secretCodeService.delete(id)
       fetchData()
     } catch (err) {
-      alert('Erro ao excluir código.')
+      alert('Erro ao excluir código: ' + err.message)
     }
   }
 
   const handleUpdateUserStatus = async (userId, newStatus) => {
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ status: newStatus })
-        .eq('id', userId)
-
-      if (error) throw error
+      await profileService.updateStatus(userId, newStatus)
       fetchData()
     } catch (err) {
-      alert('Erro ao atualizar status do usuário.')
+      alert('Erro ao atualizar status do usuário: ' + err.message)
     }
   }
 
@@ -121,6 +98,30 @@ function AdminDashboard() {
       u.email?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  const handleExportCSV = () => {
+    const headers = 'Nome,Email,Status,Cargo,Data de Registro\n'
+    const rows = filteredUsers.map(user => {
+      const nome = user.full_name || ''
+      const email = user.email || ''
+      const status = user.status === 'GOLD' ? 'Ouro' : user.status === 'SILVER' ? 'Prata' : user.status === 'BRONZE' ? 'Bronze' : user.status
+      const cargo = user.role === 'admin' ? 'Admin' : 'Usuário'
+      const registro = user.created_at ? new Date(user.created_at).toLocaleDateString('pt-BR') : ''
+      return `"${nome}","${email}","${status}","${cargo}","${registro}"`
+    }).join('\n')
+
+    const blob = new Blob([headers + rows], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement("a")
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob)
+      link.setAttribute("href", url)
+      link.setAttribute("download", "usuarios_admin.csv")
+      link.style.visibility = 'hidden'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
+  }
+
   return (
     <div className="admin-page">
       <header className="admin-header glass-effect">
@@ -128,12 +129,17 @@ function AdminDashboard() {
           <ShieldAlert className="admin-icon" />
           <div>
             <h1>Painel Administrativo</h1>
-            <p>Gerenciamento de usuários e acessos do sistema</p>
+            <p>Gerenciamento de usuários e acessos</p>
           </div>
         </div>
-        <button className="btn-logout" onClick={logout}>
-          <LogOut size={18} /> Sair
-        </button>
+        <div className="header-actions">
+          <button className="btn-logout" onClick={logout}>
+            <LogOut size={16} /> Sair
+          </button>
+          <Link to="/" className="btn-back">
+            Acessar o App
+          </Link>
+        </div>
       </header>
 
       <main className="admin-content">
@@ -165,9 +171,14 @@ function AdminDashboard() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
-                <button className="btn-refresh" onClick={fetchData}>
-                  <RefreshCw size={18} /> Atualizar
-                </button>
+                <div className="table-actions-right" style={{ display: 'flex', gap: '12px' }}>
+                  <button className="btn-refresh" onClick={fetchData} disabled={loading}>
+                    <RefreshCw size={18} /> Atualizar
+                  </button>
+                  <button className="btn-export-csv" onClick={handleExportCSV}>
+                    <Download size={18} /> Exportar CSV
+                  </button>
+                </div>
               </div>
 
               <div className="table-wrapper">
@@ -176,8 +187,9 @@ function AdminDashboard() {
                     <tr>
                       <th>Usuário</th>
                       <th>Email</th>
-                      <th>Status atual</th>
                       <th>Cargo</th>
+                      <th>Status Atual</th>
+                      <th>Registro</th>
                       <th>Ações</th>
                     </tr>
                   </thead>
@@ -196,38 +208,36 @@ function AdminDashboard() {
                           </div>
                         </td>
                         <td>{user.email}</td>
+                        <td>{user.role === 'admin' ? '👑 Admin' : '👤 Usuário'}</td>
                         <td>
                           <span
                             className={`status-badge ${user.status.toLowerCase()}`}
                           >
-                            {user.status}
+                            {user.status === 'GOLD' ? 'Ouro' : user.status === 'SILVER' ? 'Prata' : user.status === 'BRONZE' ? 'Bronze' : user.status}
                           </span>
                         </td>
-                        <td>{user.role}</td>
+                        <td>{formatDate(user.created_at)}</td>
                         <td className="actions-cell">
                           <button
-                            onClick={() =>
-                              handleUpdateUserStatus(user.id, 'SILVER')
-                            }
-                            title="Tornar Silver"
+                            className="btn-status btn-bronze-action"
+                            onClick={() => handleUpdateUserStatus(user.id, 'BRONZE')}
+                            title="Rebaixar para Bronze"
                           >
-                            🥈
+                            <UserMinus size={16} />
                           </button>
                           <button
-                            onClick={() =>
-                              handleUpdateUserStatus(user.id, 'GOLD')
-                            }
-                            title="Tornar Gold"
+                            className="btn-status btn-silver-action"
+                            onClick={() => handleUpdateUserStatus(user.id, 'SILVER')}
+                            title="Promover para Prata"
                           >
-                            🥇
+                            <ShieldCheck size={16} />
                           </button>
                           <button
-                            onClick={() =>
-                              handleUpdateUserStatus(user.id, 'BRONZE')
-                            }
-                            title="Resetar para Bronze"
+                            className="btn-status btn-gold-action"
+                            onClick={() => handleUpdateUserStatus(user.id, 'GOLD')}
+                            title="Promover para Ouro"
                           >
-                            🥉
+                            <Award size={16} />
                           </button>
                         </td>
                       </tr>
@@ -241,7 +251,7 @@ function AdminDashboard() {
               <form className="create-code-form" onSubmit={handleCreateCode}>
                 <input
                   type="text"
-                  placeholder="Novo código mestre (Ex: UNIP2024)"
+                  placeholder="Novo código mestre (ex: UNIP2024)"
                   value={newCode}
                   onChange={(e) => setNewCode(e.target.value)}
                 />
@@ -276,7 +286,7 @@ function AdminDashboard() {
                           )}
                         </td>
                         <td>
-                          {new Date(code.created_at).toLocaleDateString()}
+                          {formatDate(code.created_at)}
                         </td>
                         <td>
                           <button

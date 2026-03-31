@@ -1,48 +1,84 @@
 import { motion } from 'framer-motion'
 import { AlertCircle, CheckCircle, Key, Shield } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import './Onboarding.css'
 
 function Onboarding() {
-  const { validateCode, profile, logout } = useAuth()
+  const { validateCode, profile, logout, isSilver, isAdmin, loading: authLoading } = useAuth()
   const [code, setCode] = useState('')
   const [accepted, setAccepted] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
   const navigate = useNavigate()
 
+  /**
+   * Bug 3 fix: Se o usuário já tem status SILVER/GOLD ou é admin,
+   * ele não deve estar nesta tela. Redireciona para o início.
+   * Cobre o caso de retorno após fechar o app com conta já ativada.
+   */
+  useEffect(() => {
+    if (!authLoading && (isSilver || isAdmin)) {
+      navigate('/', { replace: true })
+    }
+  }, [isSilver, isAdmin, authLoading, navigate])
+
+  /**
+   * Bug 1 fix: `isLoggingOut` é um estado separado de `loading` (submit).
+   * Evita que o spinner apareça no botão "Ativar Minha Conta" ao clicar em "Sair".
+   */
   const handleLogout = async () => {
-    setLoading(true)
+    setIsLoggingOut(true)
+    setError('')
     try {
       await logout()
       navigate('/login', { replace: true })
     } catch (err) {
       console.error('Logout error:', err)
       setError('Falha ao sair da conta. Tente novamente.')
-      setLoading(false)
+    } finally {
+      setIsLoggingOut(false)
     }
   }
 
+  /**
+   * Bug 2 fix: `finally` garante que `loading` seja sempre zerado,
+   * evitando loop infinito caso `validateCode` não lance exceção.
+   * Também valida `data` retornado — RPC pode retornar `false` sem `error`.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setError('')
+
     if (!accepted) {
       setError('Você precisa aceitar os termos de uso para continuar.')
       return
     }
+    if (!code.trim()) {
+      setError('Insira o código secreto antes de continuar.')
+      return
+    }
 
     setLoading(true)
-    setError('')
-
     try {
-      await validateCode(code)
-      navigate('/', { replace: true })
+      const success = await validateCode(code)
+      if (success) {
+        navigate('/', { replace: true })
+      } else {
+        // RPC retornou false (sem erro explícito) — código inválido
+        setError('Código secreto inválido ou expirado.')
+      }
     } catch (err) {
       setError(err.message || 'Erro ao validar o código secreto.')
+    } finally {
       setLoading(false)
     }
   }
+
+  // Enquanto o AuthContext verifica o perfil, não renderiza nada (evita flash)
+  if (authLoading) return null
 
   return (
     <div className="onboarding-page">
@@ -124,15 +160,20 @@ function Onboarding() {
           </div>
 
           <div className="onboarding-actions">
+            {/* type="button" previne submit do form ao clicar em Sair */}
             <button
               type="button"
               className="btn-secondary"
               onClick={handleLogout}
-              disabled={loading}
+              disabled={loading || isLoggingOut}
             >
-              Sair da Conta
+              {isLoggingOut ? <span className="loader-spinner"></span> : 'Sair da Conta'}
             </button>
-            <button type="submit" className="btn-primary" disabled={loading}>
+            <button
+              type="submit"
+              className="btn-primary"
+              disabled={loading || isLoggingOut}
+            >
               {loading ? (
                 <span className="loader-spinner"></span>
               ) : (

@@ -1,15 +1,20 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
+  AlertCircle,
   Calendar,
   CreditCard,
   GraduationCap,
   MapPin,
   Send,
   Trash2,
+  ShieldAlert,
   User,
+  LogOut,
 } from 'lucide-react'
 import { useNavigate, Link } from 'react-router-dom'
+import { useAuth } from '@/context/AuthContext'
+import { authService } from '@/services/authService'
 import { listaDeCampus } from '@/data/campus.js'
 import { listaDeCursos } from '@/data/cursos.js'
 import { studentService } from '@/services/studentService'
@@ -26,7 +31,10 @@ import './Form.css'
  */
 function Form() {
   const navigate = useNavigate()
+  const { logout, user, isGold, isAdmin, refreshProfile } = useAuth()
   const [loading, setLoading] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [formError, setFormError] = useState('')
   const [formData, setFormData] = useState(() => {
     const saved = localStorage.getItem('unip-card-data')
     return saved
@@ -57,32 +65,76 @@ function Form() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setFormError('')
 
-    if (formData.document_id.length < 12) return alert('RG (ID) is incomplete.')
-    if (formData.birth_date.length < 10)
-      return alert('Birth date is incomplete.')
+    const nameParts = formData.name.trim().split(' ')
+    if (nameParts.length < 2) {
+      setFormError('Por favor, informe nome e sobrenome.')
+      return
+    }
+
+    if (formData.document_id.length < 12) {
+      setFormError('Documento de identidade (RG) incompleto.')
+      return
+    }
+
+    const rgDigits = formData.document_id.replace(/\D/g, '')
+    if (/^(\d)\1+$/.test(rgDigits)) {
+      setFormError('Número de RG inválido (números repetidos).')
+      return
+    }
+
+    if (formData.birth_date.length < 10) {
+      setFormError('Data de nascimento incompleta. Use o formato DD/MM/AAAA.')
+      return
+    }
+
+    const dateParts = formData.birth_date.split('/')
+    if (dateParts.length === 3) {
+      const d = parseInt(dateParts[0], 10)
+      const m = parseInt(dateParts[1], 10)
+      const y = parseInt(dateParts[2], 10)
+      const dateObj = new Date(y, m - 1, d)
+      if (
+        dateObj.getFullYear() !== y ||
+        dateObj.getMonth() !== m - 1 ||
+        dateObj.getDate() !== d ||
+        y < 1920 ||
+        y >= new Date().getFullYear()
+      ) {
+        setFormError('Data de nascimento inválida.')
+        return
+      }
+    }
 
     setLoading(true)
     try {
+      // NOTE: created_at is intentionally omitted — the database uses DEFAULT NOW()
       const dataToSave = {
         ...formData,
         registration_id: generateRegistrationId().toString(),
-        created_at: new Date().toISOString(),
+        user_id: user.id,
       }
 
       const savedStudent = await studentService.create(dataToSave)
+      
+      if (!isGold) {
+        await authService.promoteToGold(user.id)
+        await refreshProfile()
+      }
+      
       // Redirect to the card visualization page
       navigate(`/card/${savedStudent.id}`)
     } catch (error) {
       console.error('Error saving student:', error)
-      alert('Error saving data. Please check your connection.')
+      setFormError('Erro ao salvar os dados. Verifique sua conexão e tente novamente.')
     } finally {
       setLoading(false)
     }
   }
 
   const handleReset = () => {
-    if (window.confirm('Clear all fields?')) {
+    if (window.confirm('Limpar todos os campos?')) {
       setFormData({
         name: '',
         document_id: '',
@@ -91,6 +143,19 @@ function Form() {
         campus: '',
       })
       localStorage.removeItem('unip-card-data')
+    }
+  }
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    try {
+      await logout()
+      navigate('/login', { replace: true })
+    } catch (err) {
+      console.error('Logout error:', err)
+      setFormError('Falha ao sair da conta.')
+    } finally {
+      setIsLoggingOut(false)
     }
   }
 
@@ -104,33 +169,53 @@ function Form() {
         <div className="form-header">
           <div className="title-wrapper">
             <CreditCard className="header-icon" />
-            <h1>UNIP Card Generator</h1>
+            <div>
+              <div className={`status-badge ${isGold ? 'gold' : 'silver'}`}>
+                NÍVEL {isGold ? 'OURO' : 'PRATA'}
+              </div>
+              <h1>Gerador de Carteirinha UNIP</h1>
+            </div>
           </div>
-          <Link to="/history" className="link-historico">
-            View History
-          </Link>
+          <div className="header-actions">
+            <button
+              type="button"
+              className="btn-logout"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+            >
+              {isLoggingOut ? <span className="loader-spinner"></span> : <><LogOut size={16} /> Sair</>}
+            </button>
+            <Link to="/history" className="link-history">
+              Ver Histórico
+            </Link>
+            {isAdmin && (
+              <Link to="/admin" className="link-history admin-btn" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', borderColor: 'rgba(245, 158, 11, 0.2)' }}>
+                <ShieldAlert size={16} style={{ marginRight: '6px' }} /> Painel Admin
+              </Link>
+            )}
+          </div>
         </div>
 
         <div className="form-grid">
           <fieldset>
             <legend>
-              <User className="legend-icon" /> Student Data
+              <User className="legend-icon" /> Dados do Aluno
             </legend>
             <div className="form-group">
-              <label htmlFor="name">Full Name</label>
+              <label htmlFor="name">Nome Completo</label>
               <input
                 type="text"
                 id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="STUDENT NAME"
+                placeholder="NOME DO ALUNO"
                 required
               />
             </div>
             <div className="form-row">
               <div className="form-group flex-1">
-                <label htmlFor="document_id">Identity Document (RG)</label>
+                <label htmlFor="document_id">Documento de Identidade (RG)</label>
                 <div className="input-with-icon">
                   <input
                     type="text"
@@ -145,7 +230,7 @@ function Form() {
                 </div>
               </div>
               <div className="form-group flex-1">
-                <label htmlFor="birth_date">Birth Date</label>
+                <label htmlFor="birth_date">Data de Nascimento</label>
                 <div className="input-with-icon">
                   <input
                     type="text"
@@ -165,10 +250,10 @@ function Form() {
 
           <fieldset>
             <legend>
-              <GraduationCap className="legend-icon" /> Academic Info
+              <GraduationCap className="legend-icon" /> Informações Acadêmicas
             </legend>
             <div className="form-group">
-              <label htmlFor="course">Course</label>
+              <label htmlFor="course">Curso</label>
               <select
                 id="course"
                 name="course"
@@ -177,7 +262,7 @@ function Form() {
                 required
               >
                 <option value="" disabled>
-                  Select a course
+                  Selecione um curso
                 </option>
                 {listaDeCursos.map((c) => (
                   <option key={c} value={c}>
@@ -187,7 +272,7 @@ function Form() {
               </select>
             </div>
             <div className="form-group">
-              <label htmlFor="campus">Campus / Unit</label>
+              <label htmlFor="campus">Campus / Unidade</label>
               <div className="input-with-icon">
                 <select
                   id="campus"
@@ -197,7 +282,7 @@ function Form() {
                   required
                 >
                   <option value="" disabled>
-                    Select a campus
+                    Selecione um campus
                   </option>
                   {listaDeCampus.map((c) => (
                     <option key={c} value={c}>
@@ -211,7 +296,17 @@ function Form() {
           </fieldset>
         </div>
 
+        {formError && (
+          <div className="form-error-inline">
+            <AlertCircle size={16} />
+            <span>{formError}</span>
+          </div>
+        )}
+
         <div className="button-group">
+          <button type="button" className="btn-reset" onClick={handleReset}>
+            <Trash2 size={18} /> Limpar
+          </button>
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -220,16 +315,13 @@ function Form() {
             disabled={loading}
           >
             {loading ? (
-              'Saving...'
+              'Salvando...'
             ) : (
               <>
-                <Send size={18} /> Generate Card
+                <Send size={18} /> Gerar Carteirinha
               </>
             )}
           </motion.button>
-          <button type="button" className="btn-reset" onClick={handleReset}>
-            <Trash2 size={18} /> Clear
-          </button>
         </div>
       </form>
     </motion.div>

@@ -1,5 +1,8 @@
 /**
- * Níveis de acesso/status do aluno.
+ * Access/status levels for user accounts.
+ * BRONZE: nível padrão, acesso somente leitura.
+ * SILVER: ativado via código secreto, acesso completo à geração de carteirinha.
+ * GOLD: status elevado, atribuído manualmente por administradores.
  */
 export const USER_STATUS = {
   BRONZE: 'BRONZE',
@@ -16,7 +19,7 @@ export const USER_ROLES = {
 }
 
 /**
- * Mensagens de erro padronizadas para autenticação.
+ * Mensagens de erro padronizadas para os fluxos de autenticação.
  */
 export const AUTH_ERRORS = {
   NOT_AUTHENTICATED: 'Usuário não autenticado. Por favor, faça login.',

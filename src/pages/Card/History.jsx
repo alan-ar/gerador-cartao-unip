@@ -9,6 +9,7 @@ import {
   Eye,
   LogOut,
   Plus,
+  ShieldCheck,
   Table,
   Trash2,
 } from 'lucide-react'
@@ -38,13 +39,13 @@ const History = () => {
     if (!students || students.length === 0) return
 
     const headers = [
-      'Name',
-      'Document ID',
-      'Birth Date',
-      'Course',
+      'Nome',
+      'RG',
+      'Data de Nascimento',
+      'Curso',
       'Campus',
-      'Registration',
-      'Creation Date',
+      'Matrícula',
+      'Data de Cadastro',
     ]
     const rows = students.map((s) => [
       s.name,
@@ -60,7 +61,7 @@ const History = () => {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
     const link = document.createElement('a')
     link.href = URL.createObjectURL(blob)
-    link.download = 'registered_students.csv'
+    link.download = 'historico_alunos.csv'
     link.click()
   }
 
@@ -74,13 +75,13 @@ const History = () => {
         <div className="title-section">
           <Table className="title-icon" />
           <div>
-            <h1>Registration History</h1>
-            <p>Manage records saved in the cloud</p>
+            <h1>Histórico de Cadastros</h1>
+            <p>Gerencie os registros salvos na nuvem</p>
           </div>
         </div>
         <div className="historico-actions">
-          <button onClick={handleLogout} className="btn-logout" title="Logout">
-            <LogOut size={18} /> Logout
+          <button onClick={handleLogout} className="btn-logout" title="Sair">
+            <LogOut size={18} /> Sair
           </button>
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -89,10 +90,10 @@ const History = () => {
             className="btn-export"
             disabled={students.length === 0}
           >
-            <Download size={18} /> Export CSV
+            <Download size={18} /> Exportar CSV
           </motion.button>
           <Link to="/" className="btn-back">
-            <Plus size={18} /> New Card
+            <Plus size={18} /> Nova Carteirinha
           </Link>
         </div>
       </div>
@@ -101,13 +102,13 @@ const History = () => {
         <table className="historico-table">
           <thead>
             <tr>
-              <th>Student Name</th>
-              <th>Registration</th>
-              <th>Course / Unit</th>
+              <th>Nome do Aluno</th>
+              <th>Matrícula</th>
+              <th>Curso / Unidade</th>
               <th>
-                <DateIcon size={14} /> Created At
+                <DateIcon size={14} /> Cadastrado em
               </th>
-              <th>Actions</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -119,7 +120,7 @@ const History = () => {
                   exit={{ opacity: 0 }}
                 >
                   <td colSpan="5" className="status-cell">
-                    Fetching records from cloud...
+                    Buscando registros na nuvem...
                   </td>
                 </motion.tr>
               ) : error ? (
@@ -139,7 +140,7 @@ const History = () => {
                   exit={{ opacity: 0 }}
                 >
                   <td colSpan="5" className="status-cell">
-                    No records found.
+                    Nenhum registro encontrado.
                   </td>
                 </motion.tr>
               ) : (
@@ -153,7 +154,7 @@ const History = () => {
                   >
                     <td>
                       <div className="aluno-name">{student.name}</div>
-                      <div className="aluno-rg">ID: {student.document_id}</div>
+                      <div className="aluno-rg">RG: {student.document_id}</div>
                     </td>
                     <td>
                       <span className="badge-matricula">
@@ -170,14 +171,21 @@ const History = () => {
                         <Link
                           to={`/card/${student.id}`}
                           className="btn-view"
-                          title="View Card"
+                          title="Carteirinha"
                         >
                           <Eye size={18} />
+                        </Link>
+                        <Link
+                          to={`/validation?id=${student.id}`}
+                          className="btn-verify"
+                          title="Validação"
+                        >
+                          <ShieldCheck size={18} />
                         </Link>
                         <button
                           onClick={() => deleteStudent(student.id)}
                           className="btn-delete"
-                          title="Delete from cloud"
+                          title="Excluir"
                         >
                           <Trash2 size={18} />
                         </button>
@@ -193,7 +201,7 @@ const History = () => {
 
       <div className="footer-actions">
         <Link to="/" className="link-back">
-          <ChevronLeft size={16} /> Back to Home
+          <ChevronLeft size={16} /> Voltar ao Início
         </Link>
       </div>
     </motion.div>

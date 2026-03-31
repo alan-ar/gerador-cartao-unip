@@ -30,10 +30,14 @@ export const authService = {
    * Gets the complete profile of the authenticated user (Metadata + profiles table data).
    * Implements 'Lazy Profile Creation' as a fallback for potential database trigger latency.
    */
-  getProfile: async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+  getProfile: async (passedUser = null) => {
+    let user = passedUser
+    
+    // Fallback to fetch user if not provided
+    if (!user) {
+      const { data } = await supabase.auth.getUser()
+      user = data?.user
+    }
 
     if (!user) return null
 
@@ -106,9 +110,30 @@ export const authService = {
 
     if (error) {
       console.error('Validation error:', error.message)
-      throw new Error(error.message || 'Invalid or expired secret code.')
+      const errorMessage = error.message.includes('Invalid or expired code') 
+        ? 'Código secreto inválido ou expirado.'
+        : 'Erro ao validar o código secreto. Tente novamente.'
+      throw new Error(errorMessage)
     }
 
+    return data
+  },
+
+  /**
+   * Promotes the user to GOLD status.
+   */
+  promoteToGold: async (userId) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({ status: 'GOLD', updated_at: new Date().toISOString() })
+      .eq('id', userId)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Promotion error:', error.message)
+      throw new Error('Falha ao promover usuário para Ouro.')
+    }
     return data
   },
 

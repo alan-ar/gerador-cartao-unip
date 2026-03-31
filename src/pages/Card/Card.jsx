@@ -37,8 +37,10 @@ function Card({ data: initialData }) {
 
   useEffect(() => {
     if (!student) return
-    const currentYear = new Date().getFullYear()
-    setExpiryDate(`DEC/${currentYear}`)
+    // Derive expiry year from the card's creation date (stored in DB),
+    // so the displayed year always reflects the actual issuance year.
+    const createdYear = new Date(student.created_at).getFullYear()
+    setExpiryDate(`DEZ/${createdYear}`)
   }, [student])
 
   const fetchStudent = async (studentId) => {
@@ -48,7 +50,7 @@ function Card({ data: initialData }) {
       setStudent(data)
     } catch (err) {
       console.error('Error fetching student:', err)
-      setError('Card not found or connection error.')
+      setError('Carteirinha não encontrada ou erro de conexão.')
     } finally {
       setLoading(false)
     }
@@ -85,7 +87,7 @@ function Card({ data: initialData }) {
           })
           .catch((err) => {
             console.error('Export error:', err)
-            alert('Error generating image.')
+            alert('Erro ao gerar imagem.')
             setIsExporting(false)
           })
       }, 100)
@@ -96,7 +98,7 @@ function Card({ data: initialData }) {
     return (
       <div className="card-loading">
         <Loader2 className="animate-spin" size={48} />
-        <p>Loading card...</p>
+        <p>Carregando carteirinha...</p>
       </div>
     )
   }
@@ -105,9 +107,9 @@ function Card({ data: initialData }) {
     return (
       <div className="card-error">
         <h2>Oops!</h2>
-        <p>{error || 'Student card not found.'}</p>
-        <Link to="/" className="btn-back">
-          <ChevronLeft /> Back to Home
+        <p>{error || 'Carteirinha do aluno não encontrada.'}</p>
+        <Link to="/history" className="btn-back">
+          <ChevronLeft /> Voltar ao Histórico
         </Link>
       </div>
     )
@@ -125,57 +127,57 @@ function Card({ data: initialData }) {
         className="card-page-container"
       >
         <div className="card-view-header">
-          <Link to="/" className="btn-back-link">
-            <ChevronLeft size={18} /> New Registration
+          <Link to="/history" className="btn-back-link">
+            <ChevronLeft size={18} /> Voltar ao Histórico
           </Link>
           <div className="header-status">
             <CheckCircle size={16} color="#10b981" />
-            <span>Card Generated</span>
+            <span>Carteirinha Gerada</span>
           </div>
         </div>
 
         <div className="card-wrapper">
-          <div className="fundo-cartao" ref={cardRef}>
+          <div className="card-background" ref={cardRef}>
             <div className="card-top">
               <img src="/unip.png" alt="UNIP" className="logo" />
               <div className="univ-info">
-                <p className="universidade">UNIVERSIDADE PAULISTA</p>
+                <p className="university">UNIVERSIDADE PAULISTA</p>
                 <div className="badge-valid">
-                  <ShieldCheck size={12} /> DIGITAL DOCUMENT
+                  <ShieldCheck size={12} /> DOCUMENTO DIGITAL
                 </div>
               </div>
             </div>
 
-            <p className="curso-tag">{student.course || 'COURSE'}</p>
+            <p className="course-tag">{student.course || 'COURSE'}</p>
 
             <div className="card-body">
               <div className="info-section">
                 <div className="data-field">
-                  <label>NAME</label>
-                  <p className="val-nome">{student.name}</p>
+                  <label>NOME</label>
+                  <p className="val-name">{student.name}</p>
                 </div>
 
                 <div className="data-grid">
                   <div className="data-field">
-                    <label>REGISTRATION</label>
+                    <label>MATRÍCULA</label>
                     <p>{student.registration_id}</p>
                   </div>
                   <div className="data-field">
-                    <label>ID DOCUMENT</label>
+                    <label>RG</label>
                     <p>{student.document_id}</p>
                   </div>
                   <div className="data-field">
-                    <label>BIRTH DATE</label>
+                    <label>NASCIMENTO</label>
                     <p>{student.birth_date}</p>
                   </div>
                   <div className="data-field">
-                    <label>VALIDITY</label>
+                    <label>VALIDADE</label>
                     <p className="highlight-val">{expiryDate}</p>
                   </div>
                 </div>
 
                 <div className="data-field campus-field">
-                  <label>CAMPUS / UNIT</label>
+                  <label>CAMPUS / UNIDADE</label>
                   <p>{student.campus}</p>
                 </div>
               </div>
@@ -184,19 +186,19 @@ function Card({ data: initialData }) {
                 <div className="qr-container">
                   <QRCodeSVG
                     value={validationUrl}
-                    size={120}
+                    size={130}
                     level="H"
                     includeMargin={false}
                     className="qrcode"
                   />
                 </div>
-                <span className="qr-label">VALIDATE DOCUMENT</span>
+                <span className="qr-label">VALIDAR DOCUMENTO</span>
               </div>
             </div>
 
             <div className="card-footer">
               <div className="stripe"></div>
-              <p>This card is personal and non-transferable.</p>
+              <p>Este cartão é pessoal e intransferível.</p>
             </div>
           </div>
         </div>
@@ -210,15 +212,15 @@ function Card({ data: initialData }) {
             disabled={isExporting}
           >
             {isExporting ? (
-              'Processing...'
+              'Processando...'
             ) : (
               <>
-                <Download size={20} /> Download Card (PNG)
+                <Download size={20} /> Baixar Carteirinha (PNG)
               </>
             )}
           </motion.button>
           <div className="success-msg">
-            <CheckCircle size={16} /> Visualization link ready
+            <CheckCircle size={16} /> Link de visualização pronto
           </div>
         </div>
       </motion.div>

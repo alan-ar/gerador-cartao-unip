@@ -19,7 +19,7 @@
   box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.6);
 }
 
-.fundo-cartao {
+.card-background {
   width: 380px;
   height: 580px;
   background: #fff;
@@ -52,7 +52,7 @@
   gap: 4px;
 }
 
-.universidade {
+.university {
   font-size: 0.85rem;
   font-weight: 800;
   color: #1e1b4b;
@@ -74,7 +74,7 @@
   width: fit-content;
 }
 
-.curso-tag {
+.course-tag {
   background: #1e1b4b;
   color: #fce7f3;
   padding: 12px 24px;
@@ -108,7 +108,7 @@
   text-transform: uppercase;
 }
 
-.val-nome {
+.val-name {
   font-size: 1.1rem;
   font-weight: 700;
   color: #0f172a;
@@ -150,8 +150,8 @@
 }
 
 .qrcode {
-  width: 70px;
-  height: 70px;
+  width: auto;
+  height: auto;
 }
 
 .qr-label {
@@ -162,6 +162,7 @@
   letter-spacing: 0.15em;
   writing-mode: vertical-rl;
   transform: rotate(180deg);
+  white-space: nowrap;
 }
 
 .card-footer {
@@ -258,8 +259,8 @@
   border-radius: 99px;
 }
 
-.cartao-loading,
-.cartao-error {
+.card-loading,
+.card-error {
   min-height: 80vh;
   display: flex;
   flex-direction: column;
@@ -275,13 +276,13 @@
   color: var(--primary);
 }
 
-.cartao-error h2 {
+.card-error h2 {
   color: var(--danger);
   font-family: 'Outfit', sans-serif;
   font-size: 2rem;
 }
 
-.cartao-error .btn-back {
+.card-error .btn-back {
   background: rgba(255, 255, 255, 0.05);
   color: #fff;
   text-decoration: none;
@@ -304,7 +305,7 @@
 }
 
 @media (max-width: 400px) {
-  .fundo-cartao {
+  .card-background {
     width: 320px;
     height: 500px;
   }

@@ -8,18 +8,23 @@
  */
 export const formatDocumentId = (value) => {
   if (!value) return ''
-  let v = value
-    .toUpperCase()
-    .replace(/[^0-9X]/g, '')
-    .substring(0, 9)
-
+  let v = value.toUpperCase().replace(/[^0-9X]/g, '')
+  
+  // Impede que a letra X seja inserida no meio dos números (só no dígito final)
   if (v.indexOf('X') !== -1 && v.indexOf('X') !== 8) {
     v = v.replace(/X/g, '')
   }
 
-  v = v.replace(/^(\d{2})/, '$1.')
-  v = v.replace(/^(\d{2})\.(\d{3})/, '$1.$2.')
-  v = v.replace(/(\d{3})-?([\dX])$/, '$1-$2')
+  if (v.length > 9) v = v.substring(0, 9)
+
+  if (v.length > 8) {
+    return `${v.substring(0, 2)}.${v.substring(2, 5)}.${v.substring(5, 8)}-${v.substring(8, 9)}`
+  } else if (v.length > 5) {
+    return `${v.substring(0, 2)}.${v.substring(2, 5)}.${v.substring(5)}`
+  } else if (v.length > 2) {
+    return `${v.substring(0, 2)}.${v.substring(2)}`
+  }
+
   return v
 }
 

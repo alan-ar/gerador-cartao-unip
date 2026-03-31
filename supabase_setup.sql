@@ -48,13 +48,10 @@ CREATE TABLE IF NOT EXISTS public.secret_codes (
 -- Profiles: Users see own. Admins see all.
 CREATE POLICY "Users can view their own profile" ON public.profiles FOR
 SELECT USING (auth.uid() = id);
-
-CREATE POLICY "Users can insert their own profile" ON public.profiles FOR 
+CREATE POLICY "Users can insert their own profile" ON public.profiles FOR
 INSERT WITH CHECK (auth.uid() = id);
-
-CREATE POLICY "Users can update their own profile" ON public.profiles FOR 
+CREATE POLICY "Users can update their own profile" ON public.profiles FOR
 UPDATE USING (auth.uid() = id);
-
 CREATE POLICY "Admins can manage all profiles" ON public.profiles FOR ALL USING (
   EXISTS (
     SELECT 1
@@ -63,9 +60,10 @@ CREATE POLICY "Admins can manage all profiles" ON public.profiles FOR ALL USING 
       AND role = 'admin'
   )
 );
-
--- Students: Users manage their own records.
+-- Students: Users manage their own records. Public can validate via ID.
 CREATE POLICY "Users manage their own students" ON public.students FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "Anyone can view students for validation" ON public.students FOR
+SELECT USING (true);
 -- Secret Codes: Admins manage all. Authenticated users select.
 CREATE POLICY "Admins manage secret codes" ON public.secret_codes FOR ALL USING (
   EXISTS (

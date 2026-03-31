@@ -11,47 +11,68 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    /**
-     * Centralized auth state handler.
-     */
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setLoading(true)
+    let mounted = true
 
-      // Safety timeout to prevent infinite loading (5 seconds)
-      const timeoutId = setTimeout(() => {
-        setLoading(false)
-        console.warn('[AuthContext] Loading safety timeout reached.')
-      }, 5000)
-
+    const syncSession = async (session) => {
+      if (!mounted) return
       try {
         if (session?.user) {
-          console.debug(`[AuthContext] Auth event: ${event}`)
           setUser(session.user)
-
-          // Set temporary profile from metadata to avoid flicker
-          setProfile({
+          // Profile temporário para exibir a foto/nome rapidamente sem perder o status anterior
+          setProfile((prev) => ({
+            ...prev,
             ...session.user,
-            full_name: session.user.user_metadata?.full_name || session.user.email,
-          })
-
-          // Fetch full database profile
-          const fullProfile = await authService.getProfile()
-          setProfile(fullProfile)
+            full_name: session.user.user_metadata?.full_name || session.user.email || prev?.full_name,
+          }))
+          
+          const fullProfile = await authService.getProfile(session.user)
+          if (mounted) setProfile(fullProfile)
         } else {
+          if (mounted) {
+            setUser(null)
+            setProfile(null)
+          }
+        }
+      } catch (err) {
+        console.error('[AuthContext] Erro ao sincronizar sessão:', err)
+      } finally {
+        // SEMPRE desliga a tela de loading. Nunca ativa ela novamente.
+        if (mounted) setLoading(false)
+      }
+    }
+
+    // 1. Busca síncrona/segura (Resolve o bug do Google Login travando na tela preta)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      syncSession(session)
+    })
+
+    // 2. Assinatura para eventos reativos (Ignora INITIAL_SESSION pois o getSession já fez)
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      console.debug(`[AuthContext] Auth event: ${event}`)
+      
+      if (event === 'INITIAL_SESSION') return
+
+      if (event === 'SIGNED_OUT') {
+        if (mounted) {
           setUser(null)
           setProfile(null)
+          setLoading(false)
         }
-      } catch (error) {
-        console.error(`[AuthContext] Fatal auth state error:`, error)
-      } finally {
-        clearTimeout(timeoutId)
-        setLoading(false)
+        return
+      }
+
+      // Lidar com SIGNED_IN (OAuth concluído), TOKEN_REFRESHED, USER_UPDATED de forma silenciosa e segura
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+        syncSession(session)
       }
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
   }, [])
 
 
@@ -62,7 +83,8 @@ export const AuthProvider = ({ children }) => {
   const refreshProfile = async () => {
     setLoading(true)
     try {
-      const fullProfile = await authService.getProfile()
+      // Pega o snapshot local do usuário antes de chamar o serviço
+      const fullProfile = await authService.getProfile(user)
       setProfile(fullProfile)
     } finally {
       setLoading(false)
@@ -73,10 +95,15 @@ export const AuthProvider = ({ children }) => {
   const logout = () => authService.logout()
   
   const validateCode = async (code) => {
-    const result = await authService.validateSecretCode(code)
-    // IMPORTANT: After validating, we must refresh to see the NEW status (SILVER)
-    await refreshProfile()
-    return result
+    try {
+      const result = await authService.validateSecretCode(code)
+      // Atualiza o perfil para refletir o novo status (SILVER)
+      await refreshProfile()
+      return result
+    } catch (error) {
+      // Re-lança explicitamente para que o componente trate o erro
+      throw error
+    }
   }
 
 
@@ -99,6 +126,7 @@ export const AuthProvider = ({ children }) => {
         isAdmin,
         isSilver,
         isGold,
+        refreshProfile,
       }}
     >
       {children}

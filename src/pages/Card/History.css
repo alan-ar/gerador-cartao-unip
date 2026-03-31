@@ -205,6 +205,24 @@
   color: #fff;
 }
 
+.btn-verify {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  padding: 8px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-verify:hover {
+  background: #10b981;
+  color: #fff;
+}
+
 .btn-delete:hover {
   background: var(--danger);
   color: white;

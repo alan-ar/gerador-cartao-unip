@@ -19,72 +19,65 @@ import Validation from '@/pages/Validation/Validation'
 import ProtectedRoute from '@/components/layout/ProtectedRoute'
 import { AuthProvider } from '@/context/AuthContext'
 
-/**
- * Wrapper component for Routes to use the useLocation hook properly with animations.
- */
 function AnimatedRoutes() {
-  const location = useLocation()
-
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        {/* Public Login Route */}
-        <Route path="/login" element={<Login />} />
+    <Routes>
+      {/* Public Login Route */}
+      <Route path="/login" element={<Login />} />
 
-        {/* Onboarding Route (Bronze level only) */}
-        <Route
-          path="/onboarding"
-          element={
-            <ProtectedRoute>
-              <Onboarding />
-            </ProtectedRoute>
-          }
-        />
+      {/* Onboarding (somente para BRONZE — ativados são redirecionados para /) */}
+      <Route
+        path="/onboarding"
+        element={
+          <ProtectedRoute onlyBronze={true}>
+            <Onboarding />
+          </ProtectedRoute>
+        }
+      />
 
-        {/* Card Generator (Requires Silver or Admin) */}
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute requiresSilver={true}>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="page-wrapper"
-              >
-                <Form />
-              </motion.div>
-            </ProtectedRoute>
-          }
-        />
+      {/* Card Generator (Requires Silver or Admin) */}
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute requiresSilver={true}>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="page-wrapper"
+            >
+              <Form />
+            </motion.div>
+          </ProtectedRoute>
+        }
+      />
 
-        {/* Card Visualization (Public via ID or Private with RLS) */}
-        <Route path="/card/:id" element={<Card />} />
+      {/* Card Visualization (Public via ID or Private with RLS) */}
+      <Route path="/card/:id" element={<Card />} />
 
-        {/* Protected History */}
-        <Route
-          path="/history"
-          element={
-            <ProtectedRoute requiresSilver={true}>
-              <History />
-            </ProtectedRoute>
-          }
-        />
+      {/* Protected History */}
+      <Route
+        path="/history"
+        element={
+          <ProtectedRoute requiresSilver={true}>
+            <History />
+          </ProtectedRoute>
+        }
+      />
 
-        {/* Administrative Dashboard */}
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute requiresAdmin={true}>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
+      {/* Administrative Dashboard */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute requiresAdmin={true}>
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
 
-        {/* Public Validation */}
-        <Route path="/validation" element={<Validation />} />
-      </Routes>
-    </AnimatePresence>
+      {/* Public Validation */}
+      <Route path="/validation" element={<Validation />} />
+    </Routes>
   )
 }
 

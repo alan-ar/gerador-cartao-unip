@@ -22,9 +22,12 @@ export const AuthProvider = ({ children }) => {
           setProfile((prev) => ({
             ...prev,
             ...session.user,
-            full_name: session.user.user_metadata?.full_name || session.user.email || prev?.full_name,
+            full_name:
+              session.user.user_metadata?.full_name ||
+              session.user.email ||
+              prev?.full_name,
           }))
-          
+
           const fullProfile = await authService.getProfile(session.user)
           if (mounted) setProfile(fullProfile)
         } else {
@@ -51,7 +54,7 @@ export const AuthProvider = ({ children }) => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       console.debug(`[AuthContext] Auth event: ${event}`)
-      
+
       if (event === 'INITIAL_SESSION') return
 
       if (event === 'SIGNED_OUT') {
@@ -64,7 +67,11 @@ export const AuthProvider = ({ children }) => {
       }
 
       // Lidar com SIGNED_IN (OAuth concluído), TOKEN_REFRESHED, USER_UPDATED de forma silenciosa e segura
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+      if (
+        event === 'SIGNED_IN' ||
+        event === 'TOKEN_REFRESHED' ||
+        event === 'USER_UPDATED'
+      ) {
         syncSession(session)
       }
     })
@@ -74,7 +81,6 @@ export const AuthProvider = ({ children }) => {
       subscription.unsubscribe()
     }
   }, [])
-
 
   /**
    * Refreshes the user profile from the database.
@@ -93,7 +99,7 @@ export const AuthProvider = ({ children }) => {
 
   const loginWithGoogle = () => authService.loginWithGoogle()
   const logout = () => authService.logout()
-  
+
   const validateCode = async (code) => {
     try {
       const result = await authService.validateSecretCode(code)
@@ -105,7 +111,6 @@ export const AuthProvider = ({ children }) => {
       throw error
     }
   }
-
 
   // Computando permissões de forma centralizada usando as constantes
   const isAdmin = profile?.role === USER_ROLES.ADMIN

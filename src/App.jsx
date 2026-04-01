@@ -1,18 +1,13 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import {
-  Route,
-  BrowserRouter as Router,
-  Routes,
-  useLocation,
-} from 'react-router-dom'
+import { motion } from 'framer-motion'
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 
 // Pages
 import AdminDashboard from '@/pages/Admin/AdminDashboard'
+import Login from '@/pages/Auth/Login'
+import Onboarding from '@/pages/Auth/Onboarding'
 import Card from '@/pages/Card/Card'
 import Form from '@/pages/Card/Form'
 import History from '@/pages/Card/History'
-import Login from '@/pages/Auth/Login'
-import Onboarding from '@/pages/Auth/Onboarding'
 import Validation from '@/pages/Validation/Validation'
 
 // Structure and Context Components

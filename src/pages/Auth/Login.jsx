@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
-import { AlertCircle, Lock } from 'lucide-react'
-import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
+import { motion } from 'framer-motion'
+import { AlertCircle } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import './Login.css'
 
 function Login() {
@@ -43,9 +43,17 @@ function Login() {
         className="login-card glass-effect"
       >
         <div className="login-header">
-          <img src="/unip.png" alt="UNIP Logo" className="login-logo" style={{ width: '120px', marginBottom: '32px' }} />
+          <img
+            src="/unip.png"
+            alt="UNIP Logo"
+            className="login-logo"
+            style={{ width: '120px', marginBottom: '32px' }}
+          />
           <h1>Bem-vindo</h1>
-          <p>Acesse com sua conta institucional para gerar sua credencial digital.</p>
+          <p>
+            Acesse com sua conta institucional para gerar sua credencial
+            digital.
+          </p>
         </div>
 
         <div className="login-form">

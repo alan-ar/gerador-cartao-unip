@@ -381,7 +381,7 @@ function AdminDashboard() {
                                 background: 'rgba(239, 68, 68, 0.1)',
                                 border: '1px solid rgba(239, 68, 68, 0.2)',
                                 padding: '8px',
-                                borderRadius: '10px'
+                                borderRadius: '10px',
                               }}
                             >
                               <Trash2 size={16} />

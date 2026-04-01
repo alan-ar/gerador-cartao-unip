@@ -9,7 +9,7 @@
 export const formatDocumentId = (value) => {
   if (!value) return ''
   let v = value.toUpperCase().replace(/[^0-9X]/g, '')
-  
+
   // Impede que a letra X seja inserida no meio dos números (só no dígito final)
   if (v.indexOf('X') !== -1 && v.indexOf('X') !== 8) {
     v = v.replace(/X/g, '')

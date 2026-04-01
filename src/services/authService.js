@@ -32,7 +32,7 @@ export const authService = {
    */
   getProfile: async (passedUser = null) => {
     let user = passedUser
-    
+
     // Fallback to fetch user if not provided
     if (!user) {
       const { data } = await supabase.auth.getUser()
@@ -50,7 +50,9 @@ export const authService = {
 
     // 2. Handle Profile Generation
     if (error && (error.code === 'PGRST116' || error.status === 406)) {
-      console.warn(`Profile missing or inaccessible (Code: ${error.code}). Attempting to create one...`)
+      console.warn(
+        `Profile missing or inaccessible (Code: ${error.code}). Attempting to create one...`
+      )
       const { data: newProfile, error: createError } = await supabase
         .from('profiles')
         .insert([
@@ -89,15 +91,15 @@ export const authService = {
     }
 
     // Ensure full_name is at the top level
-    const mergedProfile = { 
-      ...user, 
+    const mergedProfile = {
+      ...user,
       ...profile,
-      full_name: profile?.full_name || user.user_metadata?.full_name || user.email
+      full_name:
+        profile?.full_name || user.user_metadata?.full_name || user.email,
     }
 
     return mergedProfile
   },
-
 
   /**
    * Validates a secret code and upgrades the user to SILVER level using an atomic RPC.
@@ -110,7 +112,7 @@ export const authService = {
 
     if (error) {
       console.error('Validation error:', error.message)
-      const errorMessage = error.message.includes('Invalid or expired code') 
+      const errorMessage = error.message.includes('Invalid or expired code')
         ? 'Código secreto inválido ou expirado.'
         : 'Erro ao validar o código secreto. Tente novamente.'
       throw new Error(errorMessage)

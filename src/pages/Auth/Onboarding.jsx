@@ -1,12 +1,19 @@
+import { useAuth } from '@/context/AuthContext'
 import { motion } from 'framer-motion'
 import { AlertCircle, CheckCircle, Key, Shield } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '@/context/AuthContext'
 import './Onboarding.css'
 
 function Onboarding() {
-  const { validateCode, profile, logout, isSilver, isAdmin, loading: authLoading } = useAuth()
+  const {
+    validateCode,
+    profile,
+    logout,
+    isSilver,
+    isAdmin,
+    loading: authLoading,
+  } = useAuth()
   const [code, setCode] = useState('')
   const [accepted, setAccepted] = useState(false)
   const [error, setError] = useState('')
@@ -167,7 +174,11 @@ function Onboarding() {
               onClick={handleLogout}
               disabled={loading || isLoggingOut}
             >
-              {isLoggingOut ? <span className="loader-spinner"></span> : 'Sair da Conta'}
+              {isLoggingOut ? (
+                <span className="loader-spinner"></span>
+              ) : (
+                'Sair da Conta'
+              )}
             </button>
             <button
               type="submit"

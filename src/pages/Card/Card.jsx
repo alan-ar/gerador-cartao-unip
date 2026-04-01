@@ -126,14 +126,22 @@ function Card({ data: initialData }) {
         exit={{ opacity: 0, scale: 0.9 }}
         className="card-page-container"
       >
-        <div className="card-view-header">
-          <Link to="/history" className="btn-back-link">
-            <ChevronLeft size={18} /> Voltar ao Histórico
-          </Link>
-          <div className="header-status">
-            <CheckCircle size={16} color="#10b981" />
-            <span>Carteirinha Gerada</span>
-          </div>
+        <div className="controls-container">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="btn-download"
+            onClick={saveAsImage}
+            disabled={isExporting}
+          >
+            {isExporting ? (
+              'Processando...'
+            ) : (
+              <>
+                <Download size={20} /> Baixar Credencial (PNG)
+              </>
+            )}
+          </motion.button>
         </div>
 
         <div className="card-wrapper">
@@ -198,30 +206,15 @@ function Card({ data: initialData }) {
 
             <div className="card-footer">
               <div className="stripe"></div>
-              <p>Este cartão é pessoal e intransferível.</p>
+              <p>Esta credencial é pessoal e intransferível.</p>
             </div>
           </div>
         </div>
 
-        <div className="controls-container">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="btn-download"
-            onClick={saveAsImage}
-            disabled={isExporting}
-          >
-            {isExporting ? (
-              'Processando...'
-            ) : (
-              <>
-                <Download size={20} /> Baixar Carteirinha (PNG)
-              </>
-            )}
-          </motion.button>
-          <div className="success-msg">
-            <CheckCircle size={16} /> Link de visualização pronto
-          </div>
+        <div className="footer-actions">
+          <Link to="/history" className="btn-back-link">
+            <ChevronLeft size={18} /> Voltar ao Histórico
+          </Link>
         </div>
       </motion.div>
     </AnimatePresence>

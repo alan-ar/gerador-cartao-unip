@@ -17,6 +17,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 8px;
 }
 
 .header-left {
@@ -56,15 +57,16 @@
   background: rgba(239, 68, 68, 0.1);
   color: #f87171;
   border: 1px solid rgba(239, 68, 68, 0.2);
-  padding: 8px 16px;
-  border-radius: 12px;
-  font-size: 0.9rem;
+  padding: 0 24px;
+  border-radius: 14px;
+  font-size: 0.95rem;
   font-weight: 600;
   display: flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
+  height: 48px;
 }
 
 .btn-logout:hover {
@@ -78,15 +80,16 @@
   background: var(--primary);
   color: white;
   text-decoration: none;
-  padding: 8px 16px;
-  border-radius: 12px;
+  padding: 0 24px;
+  border-radius: 14px;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   display: flex;
   align-items: center;
   gap: 8px;
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
   transition: all 0.3s ease;
+  height: 48px;
 }
 
 .btn-back:hover {
@@ -124,9 +127,22 @@
 }
 
 .admin-tabs button.active {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.08);
   color: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.admin-tabs button.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  right: 20%;
+  height: 3px;
+  background: var(--primary);
+  border-radius: 99px;
+  box-shadow: 0 0 10px var(--primary);
 }
 
 .admin-panel {
@@ -146,7 +162,7 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--text-primary);
-  padding: 10px 16px;
+  padding: 10px 20px;
   border-radius: 12px;
   font-weight: 600;
   display: flex;
@@ -159,6 +175,17 @@
 .table-actions-right button:hover {
   background: rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
+}
+
+.btn-export-csv {
+  background: rgba(16, 185, 129, 0.1) !important;
+  color: var(--success) !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+.btn-export-csv:hover {
+  background: rgba(16, 185, 129, 0.2) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
 }
 
 .search-box {
@@ -180,18 +207,25 @@
   width: 100%;
 }
 
+.search-box:focus-within {
+  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), 0 0 20px rgba(99, 102, 241, 0.1);
+}
+
 .search-box input:focus {
   outline: none;
 }
 
 .admin-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0 8px;
   text-align: left;
 }
 
 .admin-table tr {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  /* Rows will be separated by border-spacing */
 }
 
 .admin-table th {
@@ -203,13 +237,30 @@
 
 .admin-table td {
   padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
   font-size: 0.95rem;
+  vertical-align: middle;
+}
+
+.admin-table td:first-child {
+  border-radius: 12px 0 0 12px;
+}
+
+.admin-table td:last-child {
+  border-radius: 0 12px 12px 0;
+}
+
+.flex-cell {
+  display: flex;
+  align-items: center;
+  height: 100%;
 }
 
 .user-info {
   display: flex;
   align-items: center;
   gap: 12px;
+  height: 100%;
 }
 
 .avatar-mini {
@@ -221,54 +272,66 @@
 }
 
 .status-badge {
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 0.7rem;
-  font-weight: 700;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 800;
   text-transform: uppercase;
+  margin: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  letter-spacing: 0.05em;
 }
 
 .status-badge.bronze {
-  background: rgba(205, 127, 50, 0.1);
-  color: #cd7f32;
-  border: 1px solid rgba(205, 127, 50, 0.2);
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.2) 0%, rgba(205, 127, 50, 0.3) 100%);
+  color: #fb923c;
+  border: 1px solid rgba(205, 127, 50, 0.3);
 }
+
 .status-badge.silver {
-  background: rgba(192, 192, 192, 0.1);
-  color: #c0c0c0;
-  border: 1px solid rgba(192, 192, 192, 0.2);
+  background: linear-gradient(135deg, rgba(156, 163, 175, 0.1) 0%, rgba(209, 213, 219, 0.2) 100%);
+  color: #e5e7eb;
+  border: 1px solid rgba(209, 213, 219, 0.3);
 }
+
 .status-badge.gold {
-  background: rgba(255, 215, 0, 0.1);
-  color: #ffd700;
-  border: 1px solid rgba(255, 215, 0, 0.2);
+  background: linear-gradient(135deg, rgba(180, 150, 0, 0.2) 0%, rgba(255, 215, 0, 0.3) 100%);
+  color: #fcd34d;
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  box-shadow: 0 4px 15px rgba(251, 191, 36, 0.2), inset 0 0 10px rgba(251, 191, 36, 0.1);
 }
 
 .actions-cell {
   display: flex;
   gap: 8px;
+  align-items: center;
+  height: 100%;
 }
 
-.actions-cell button {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 6px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.actions-cell button:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.actions-cell button.btn-status {
+.btn-status {
   padding: 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  transition: all 0.2s ease;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
 }
+
+.btn-status:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Status button specific styles are handled by theme classes below */
 
 .btn-silver-action {
   background: rgba(192, 192, 192, 0.1) !important;
@@ -313,17 +376,24 @@
 }
 
 .btn-add-code {
-  background: var(--primary);
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   color: #fff;
   border: none;
-  padding: 0 24px;
-  border-radius: 12px;
+  padding: 0 32px;
+  border-radius: 14px;
   font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   cursor: pointer;
   white-space: nowrap;
+  box-shadow: 0 10px 20px rgba(217, 119, 6, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-add-code:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 15px 30px rgba(217, 119, 6, 0.3);
 }
 
 .code-text {
@@ -355,13 +425,51 @@
 @media (max-width: 768px) {
   .admin-header {
     flex-direction: column;
-    gap: 20px;
+    align-items: stretch;
+    gap: 24px;
     text-align: center;
   }
   .header-left {
     flex-direction: column;
+    gap: 16px;
+  }
+  .header-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+  }
+  .header-actions > * {
+    width: 100%;
+    justify-content: center;
   }
   .search-box {
     width: 100%;
   }
+}
+
+.role-badge-admin,
+.role-badge-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  height: 32px;
+}
+
+.role-badge-admin {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.1) 100%);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.1);
+}
+
+.role-badge-user {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }

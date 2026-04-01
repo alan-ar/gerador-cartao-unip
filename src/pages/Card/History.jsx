@@ -75,8 +75,8 @@ const History = () => {
         <div className="title-section">
           <Table className="title-icon" />
           <div>
-            <h1>Histórico de Cadastros</h1>
-            <p>Gerencie os registros salvos na nuvem</p>
+            <h1>Histórico de Credenciais</h1>
+            <p>Gerencie os registros salvos na nuvem.</p>
           </div>
         </div>
         <div className="historico-actions">
@@ -92,8 +92,12 @@ const History = () => {
           >
             <Download size={18} /> Exportar CSV
           </motion.button>
-          <Link to="/" className="btn-back">
-            <Plus size={18} /> Nova Carteirinha
+          <Link
+            to="/"
+            className="btn-primary"
+            style={{ padding: '12px 20px', fontSize: '0.95rem' }}
+          >
+            <Plus size={18} /> Nova Credencial
           </Link>
         </div>
       </div>
@@ -103,7 +107,7 @@ const History = () => {
           <thead>
             <tr>
               <th>Nome do Aluno</th>
-              <th>Matrícula</th>
+              <th>Número de Matrícula</th>
               <th>Curso / Unidade</th>
               <th>
                 <DateIcon size={14} /> Cadastrado em
@@ -171,23 +175,23 @@ const History = () => {
                         <Link
                           to={`/card/${student.id}`}
                           className="btn-view"
-                          title="Carteirinha"
+                          title="Credencial"
                         >
-                          <Eye size={18} />
+                          <Eye size={16} />
                         </Link>
                         <Link
                           to={`/validation?id=${student.id}`}
                           className="btn-verify"
                           title="Validação"
                         >
-                          <ShieldCheck size={18} />
+                          <ShieldCheck size={16} />
                         </Link>
                         <button
                           onClick={() => deleteStudent(student.id)}
                           className="btn-delete"
                           title="Excluir"
                         >
-                          <Trash2 size={18} />
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </td>
@@ -201,7 +205,7 @@ const History = () => {
 
       <div className="footer-actions">
         <Link to="/" className="link-back">
-          <ChevronLeft size={16} /> Voltar ao Início
+          <ChevronLeft size={18} /> Voltar ao Início
         </Link>
       </div>
     </motion.div>

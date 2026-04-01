@@ -1,9 +1,9 @@
+import { useAuth } from '@/context/AuthContext'
+import { studentService } from '@/services/studentService'
 import { motion } from 'framer-motion'
 import { AlertCircle, ChevronLeft, Loader2, ShieldCheck } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { useAuth } from '@/context/AuthContext'
-import { studentService } from '@/services/studentService'
 import './Validation.css'
 
 /**
@@ -72,11 +72,18 @@ const Validation = () => {
         <AlertCircle size={64} color="#ef4444" />
         <h1>Validação Falhou</h1>
         <p>{error || 'Nenhum ID de validação fornecido.'}</p>
-        {user && (
-          <Link to="/history" className="btn-back">
-            <ChevronLeft /> Voltar ao Histórico
+        <div
+          className="error-actions"
+          style={{
+            marginTop: '32px',
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
+          <Link to={user ? '/history' : '/'} className="link-back">
+            <ChevronLeft size={18} /> Voltar ao {user ? 'Histórico' : 'Início'}
           </Link>
-        )}
+        </div>
       </div>
     )
   }
@@ -88,11 +95,26 @@ const Validation = () => {
       className="validacao-container"
     >
       <div className="validacao-card glass-card">
-        <div className="validacao-header">
-          <ShieldCheck size={40} color="#10b981" />
-          <div className="header-text">
-            <h1>Credencial Validada</h1>
-            <p>Documento autêntico e ativo no sistema</p>
+        <div
+          className="validation-header-container"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '24px',
+            marginBottom: '32px',
+          }}
+        >
+          <img src="/unip.png" alt="UNIP Logo" style={{ width: '80px' }} />
+          <div
+            className="validacao-header"
+            style={{ borderBottom: 'none', marginBottom: 0, paddingBottom: 0 }}
+          >
+            <ShieldCheck size={40} color="#10b981" />
+            <div className="header-text">
+              <h1>Credencial Validada</h1>
+              <p>Documento autêntico e ativo no sistema.</p>
+            </div>
           </div>
         </div>
 
@@ -108,7 +130,9 @@ const Validation = () => {
           <div className="info-row">
             <div className="info-item">
               <span className="label">Documento de Identidade</span>
-              <span className="value">{maskDocumentId(student.document_id)}</span>
+              <span className="value">
+                {maskDocumentId(student.document_id)}
+              </span>
             </div>
             <div className="info-item">
               <span className="label">Data de Nascimento</span>
@@ -128,7 +152,7 @@ const Validation = () => {
         <div className="validacao-footer">
           <div className="status-badge">
             <div className="dot"></div>
-            CARTÃO ATIVO
+            CREDENCIAL ATIVA
           </div>
           <p className="timestamp">
             Consulta realizada em: {new Date().toLocaleString('pt-BR')}
@@ -136,11 +160,13 @@ const Validation = () => {
         </div>
       </div>
 
-      {user && (
-        <Link to="/history" className="btn-home">
-          Ir para o Histórico
-        </Link>
-      )}
+      <Link
+        to={user ? '/history' : '/'}
+        className="link-back"
+        style={{ marginTop: '32px' }}
+      >
+        <ChevronLeft size={18} /> Ir para o {user ? 'Histórico' : 'Início'}
+      </Link>
     </motion.div>
   )
 }

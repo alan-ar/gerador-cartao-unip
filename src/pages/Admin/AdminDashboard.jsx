@@ -1,26 +1,28 @@
+import { useAuth } from '@/context/AuthContext'
+import { supabase } from '@/lib/supabase'
+import { profileService } from '@/services/profileService'
+import { secretCodeService } from '@/services/secretCodeService'
+import { formatDate } from '@/utils/formatters'
+import { motion } from 'framer-motion'
 import {
+  Award,
   CheckCircle,
+  Download,
   Key,
+  LayoutGrid,
   LogOut,
   Plus,
   RefreshCw,
   Search,
   ShieldAlert,
+  ShieldCheck,
   Trash2,
+  UserMinus,
   Users,
   XCircle,
-  Award,
-  ShieldCheck,
-  UserMinus,
-  Download,
 } from 'lucide-react'
-import { Link } from 'react-router-dom'
-import { formatDate } from '@/utils/formatters'
 import { useEffect, useState } from 'react'
-import { useAuth } from '@/context/AuthContext'
-import { profileService } from '@/services/profileService'
-import { secretCodeService } from '@/services/secretCodeService'
-import { supabase } from '@/lib/supabase'
+import { Link } from 'react-router-dom'
 import './AdminDashboard.css'
 
 /**
@@ -99,22 +101,33 @@ function AdminDashboard() {
   )
 
   const handleExportCSV = () => {
-    const headers = 'Nome,Email,Status,Cargo,Data de Registro\n'
-    const rows = filteredUsers.map(user => {
-      const nome = user.full_name || ''
-      const email = user.email || ''
-      const status = user.status === 'GOLD' ? 'Ouro' : user.status === 'SILVER' ? 'Prata' : user.status === 'BRONZE' ? 'Bronze' : user.status
-      const cargo = user.role === 'admin' ? 'Admin' : 'Usuário'
-      const registro = user.created_at ? new Date(user.created_at).toLocaleDateString('pt-BR') : ''
-      return `"${nome}","${email}","${status}","${cargo}","${registro}"`
-    }).join('\n')
+    const headers = 'Nome,E-mail,Status,Cargo,Data de Registro\n'
+    const rows = filteredUsers
+      .map((user) => {
+        const nome = user.full_name || ''
+        const email = user.email || ''
+        const statusText =
+          user.status === 'GOLD'
+            ? 'Ouro'
+            : user.status === 'SILVER'
+              ? 'Prata'
+              : user.status === 'BRONZE'
+                ? 'Bronze'
+                : user.status || ''
+        const cargo = user.role === 'admin' ? 'Admin' : 'Usuário'
+        const registro = user.created_at
+          ? new Date(user.created_at).toLocaleDateString('pt-BR')
+          : ''
+        return `"${nome}","${email}","${statusText}","${cargo}","${registro}"`
+      })
+      .join('\n')
 
     const blob = new Blob([headers + rows], { type: 'text/csv;charset=utf-8;' })
-    const link = document.createElement("a")
+    const link = document.createElement('a')
     if (link.download !== undefined) {
       const url = URL.createObjectURL(blob)
-      link.setAttribute("href", url)
-      link.setAttribute("download", "usuarios_admin.csv")
+      link.setAttribute('href', url)
+      link.setAttribute('download', 'usuarios_admin.csv')
       link.style.visibility = 'hidden'
       document.body.appendChild(link)
       link.click()
@@ -129,7 +142,7 @@ function AdminDashboard() {
           <ShieldAlert className="admin-icon" />
           <div>
             <h1>Painel Administrativo</h1>
-            <p>Gerenciamento de usuários e acessos</p>
+            <p>Gerenciamento de usuários e acessos.</p>
           </div>
         </div>
         <div className="header-actions">
@@ -137,7 +150,7 @@ function AdminDashboard() {
             <LogOut size={16} /> Sair
           </button>
           <Link to="/" className="btn-back">
-            Acessar o App
+            <LayoutGrid size={18} /> App
           </Link>
         </div>
       </header>
@@ -171,13 +184,26 @@ function AdminDashboard() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
-                <div className="table-actions-right" style={{ display: 'flex', gap: '12px' }}>
-                  <button className="btn-refresh" onClick={fetchData} disabled={loading}>
+                <div
+                  className="table-actions-right"
+                  style={{ display: 'flex', gap: '12px' }}
+                >
+                  <button
+                    className="btn-refresh"
+                    onClick={fetchData}
+                    disabled={loading}
+                  >
                     <RefreshCw size={18} /> Atualizar
                   </button>
-                  <button className="btn-export-csv" onClick={handleExportCSV}>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="btn-export-csv"
+                    onClick={handleExportCSV}
+                    style={{ padding: '10px 20px', borderRadius: '12px' }}
+                  >
                     <Download size={18} /> Exportar CSV
-                  </button>
+                  </motion.button>
                 </div>
               </div>
 
@@ -186,7 +212,7 @@ function AdminDashboard() {
                   <thead>
                     <tr>
                       <th>Usuário</th>
-                      <th>Email</th>
+                      <th>E-mail</th>
                       <th>Cargo</th>
                       <th>Status Atual</th>
                       <th>Registro</th>
@@ -196,49 +222,82 @@ function AdminDashboard() {
                   <tbody>
                     {filteredUsers.map((user) => (
                       <tr key={user.id}>
-                        <td>
-                          <div className="user-info">
-                            <div
-                              className="avatar-mini"
-                              style={{
-                                backgroundImage: `url(${user.avatar_url})`,
-                              }}
-                            ></div>
-                            <span>{user.full_name}</span>
+                        <td style={{ textAlign: 'left' }}>
+                          <div
+                            className="user-info"
+                            style={{ justifyContent: 'flex-start' }}
+                          >
+                            <span style={{ fontWeight: '700' }}>
+                              {user.full_name}
+                            </span>
                           </div>
                         </td>
-                        <td>{user.email}</td>
-                        <td>{user.role === 'admin' ? '👑 Admin' : '👤 Usuário'}</td>
                         <td>
-                          <span
-                            className={`status-badge ${user.status.toLowerCase()}`}
-                          >
-                            {user.status === 'GOLD' ? 'Ouro' : user.status === 'SILVER' ? 'Prata' : user.status === 'BRONZE' ? 'Bronze' : user.status}
-                          </span>
+                          <div className="flex-cell">{user.email}</div>
                         </td>
-                        <td>{formatDate(user.created_at)}</td>
-                        <td className="actions-cell">
-                          <button
-                            className="btn-status btn-bronze-action"
-                            onClick={() => handleUpdateUserStatus(user.id, 'BRONZE')}
-                            title="Rebaixar para Bronze"
-                          >
-                            <UserMinus size={16} />
-                          </button>
-                          <button
-                            className="btn-status btn-silver-action"
-                            onClick={() => handleUpdateUserStatus(user.id, 'SILVER')}
-                            title="Promover para Prata"
-                          >
-                            <ShieldCheck size={16} />
-                          </button>
-                          <button
-                            className="btn-status btn-gold-action"
-                            onClick={() => handleUpdateUserStatus(user.id, 'GOLD')}
-                            title="Promover para Ouro"
-                          >
-                            <Award size={16} />
-                          </button>
+                        <td>
+                          <div className="flex-cell">
+                            {user.role === 'admin' ? (
+                              <span className="role-badge-admin">
+                                <ShieldCheck size={14} /> Admin
+                              </span>
+                            ) : (
+                              <span className="role-badge-user">
+                                <User size={14} /> Usuário
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="flex-cell">
+                            <span
+                              className={`status-badge ${(user.status || 'BRONZE').toLowerCase()}`}
+                            >
+                              {user.status === 'GOLD'
+                                ? 'Ouro'
+                                : user.status === 'SILVER'
+                                  ? 'Prata'
+                                  : user.status === 'BRONZE'
+                                    ? 'Bronze'
+                                    : user.status || 'Bronze'}
+                            </span>
+                          </div>
+                        </td>
+                        <td>
+                          <div className="flex-cell">
+                            {formatDate(user.created_at)}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="actions-cell">
+                            <button
+                              className="btn-status btn-bronze-action"
+                              onClick={() =>
+                                handleUpdateUserStatus(user.id, 'BRONZE')
+                              }
+                              title="Rebaixar para Bronze"
+                            >
+                              <UserMinus size={16} />
+                            </button>
+                            <button
+                              className="btn-status btn-silver-action"
+                              onClick={() =>
+                                handleUpdateUserStatus(user.id, 'SILVER')
+                              }
+                              title="Promover para Prata"
+                            >
+                              <ShieldCheck size={16} />
+                            </button>
+                            <button
+                              className="btn-status btn-gold-action"
+                              onClick={() =>
+                                handleUpdateUserStatus(user.id, 'GOLD')
+                              }
+                              title="Promover para Ouro"
+                            >
+                              <Award size={16} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -251,12 +310,24 @@ function AdminDashboard() {
               <form className="create-code-form" onSubmit={handleCreateCode}>
                 <input
                   type="text"
-                  placeholder="Novo código mestre (ex: UNIP2024)"
+                  placeholder="Novo código (ex: UNIP2024)"
                   value={newCode}
                   onChange={(e) => setNewCode(e.target.value)}
                 />
-                <button type="submit" className="btn-add-code">
-                  <Plus size={18} /> Ativar Novo Código
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  style={{
+                    padding: '0 32px',
+                    borderRadius: '14px',
+                    height: '52px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  <Plus size={18} /> Ativar Código
                 </button>
               </form>
 
@@ -271,30 +342,51 @@ function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {codes.map((code) => (
+                    {codes?.map((code) => (
                       <tr key={code.id}>
-                        <td className="code-text">{code.code}</td>
                         <td>
-                          {code.is_active ? (
-                            <span className="state-active">
-                              <CheckCircle size={14} /> Ativo
-                            </span>
-                          ) : (
-                            <span className="state-inactive">
-                              <XCircle size={14} /> Expirado
-                            </span>
-                          )}
-                        </td>
-                        <td>
-                          {formatDate(code.created_at)}
-                        </td>
-                        <td>
-                          <button
-                            className="btn-delete-code"
-                            onClick={() => handleDeleteCode(code.id)}
+                          <div
+                            className="flex-cell"
+                            style={{ fontWeight: '600' }}
                           >
-                            <Trash2 size={16} />
-                          </button>
+                            {code.code}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="flex-cell">
+                            {code.is_active ? (
+                              <span className="state-active">
+                                <CheckCircle size={14} /> Ativo
+                              </span>
+                            ) : (
+                              <span className="state-inactive">
+                                <XCircle size={14} /> Expirado
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="flex-cell">
+                            {formatDate(code.created_at)}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="flex-cell">
+                            <button
+                              className="btn-status"
+                              onClick={() => handleDeleteCode(code.id)}
+                              title="Excluir Código"
+                              style={{
+                                color: '#ef4444',
+                                background: 'rgba(239, 68, 68, 0.1)',
+                                border: '1px solid rgba(239, 68, 68, 0.2)',
+                                padding: '8px',
+                                borderRadius: '10px'
+                              }}
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}

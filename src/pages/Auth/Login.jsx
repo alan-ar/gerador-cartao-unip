@@ -43,11 +43,9 @@ function Login() {
         className="login-card glass-effect"
       >
         <div className="login-header">
-          <div className="icon-badge">
-            <Lock size={24} />
-          </div>
+          <img src="/unip.png" alt="UNIP Logo" className="login-logo" style={{ width: '120px', marginBottom: '32px' }} />
           <h1>Bem-vindo</h1>
-          <p>Entre com sua conta Google para continuar</p>
+          <p>Acesse com sua conta institucional para gerar sua credencial digital.</p>
         </div>
 
         <div className="login-form">

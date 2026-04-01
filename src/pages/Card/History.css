@@ -4,8 +4,11 @@
 }
 
 .historico-header {
-  padding: 30px;
-  border-radius: 20px 20px 0 0;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 32px 40px;
+  border-radius: 24px 24px 0 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -46,15 +49,15 @@
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-secondary);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 10px 20px;
-  border-radius: 12px;
+  padding: 12px 20px;
+  border-radius: 14px;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   display: flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .btn-logout:hover {
@@ -139,14 +142,9 @@
 }
 
 .badge-matricula {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 4px 10px;
-  border-radius: 8px;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: var(--primary);
-  font-family: monospace;
+  color: var(--text-secondary);
 }
 
 .aluno-curso {
@@ -191,18 +189,21 @@
   background: rgba(99, 102, 241, 0.1);
   color: var(--primary);
   border: 1px solid rgba(99, 102, 241, 0.2);
-  padding: 8px;
-  border-radius: 10px;
+  padding: 10px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
 }
 
 .btn-view:hover {
-  background: var(--primary);
+  background: rgba(99, 102, 241, 0.2);
   color: #fff;
+  border-color: var(--primary);
+  transform: translateY(-3px) scale(1.1);
+  box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
 }
 
 .btn-verify {
@@ -219,13 +220,19 @@
 }
 
 .btn-verify:hover {
-  background: #10b981;
+  background: rgba(16, 185, 129, 0.2);
   color: #fff;
+  border-color: #10b981;
+  transform: translateY(-3px) scale(1.1);
+  box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
 }
 
 .btn-delete:hover {
-  background: var(--danger);
+  background: rgba(239, 68, 68, 0.2);
   color: white;
+  border-color: var(--danger);
+  transform: translateY(-3px) scale(1.1);
+  box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
 }
 
 .footer-actions {
@@ -237,22 +244,53 @@
 .link-back {
   color: var(--text-secondary);
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 6px;
-  transition: color 0.2s ease;
+  gap: 8px;
+  transition: all 0.2s ease;
+  margin-top: 20px;
+  border: none;
 }
 
 .link-back:hover {
   color: #fff;
+  transform: translateX(-4px);
 }
 
 @media (max-width: 800px) {
   .historico-header {
     flex-direction: column;
-    gap: 20px;
-    align-items: flex-start;
+    align-items: stretch;
+    gap: 24px;
+    text-align: center;
+    padding: 32px 24px;
+  }
+  
+  .title-section {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .historico-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .historico-actions > * {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Ocultar colunas não essenciais no mobile */
+  .historico-table th:nth-child(1),
+  .historico-table td:nth-child(1),
+  .historico-table th:nth-child(2),
+  .historico-table td:nth-child(2),
+  .historico-table th:nth-child(4),
+  .historico-table td:nth-child(4) {
+    display: none;
   }
 }

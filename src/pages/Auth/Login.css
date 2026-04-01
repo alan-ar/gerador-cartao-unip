@@ -10,13 +10,24 @@
   width: 100%;
   max-width: 420px;
   background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 32px;
-  padding: 48px 40px;
+  padding: 56px 40px;
   box-shadow: 0 40px 100px rgba(0, 0, 0, 0.4);
   text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-logo {
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+  transition: transform 0.4s ease;
+}
+
+.login-logo:hover {
+  transform: scale(1.05);
 }
 
 .icon-badge {
@@ -34,16 +45,21 @@
 
 .login-header h1 {
   font-family: 'Outfit', sans-serif;
-  font-size: 1.8rem;
+  font-size: 2rem;
   font-weight: 700;
   color: #fff;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
 }
 
 .login-header p {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.95rem;
+  line-height: 1.6;
   margin-bottom: 40px;
+  max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .login-form {
@@ -67,24 +83,24 @@
 .btn-google-login {
   background: white;
   color: #1f2937;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 14px;
-  padding: 16px;
+  border: none;
+  border-radius: 16px;
+  padding: 16px 24px;
   font-weight: 600;
   font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   margin-top: 8px;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-google-login:hover:not(:disabled) {
-  background: #f9fafb;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
 }
 
 .btn-google-login:disabled {
@@ -96,12 +112,14 @@
   margin-top: 32px;
   padding-top: 24px;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
-  font-size: 0.8rem;
-  color: var(--text-secondary);
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.5;
 }
 
 .login-footer strong {
   color: var(--primary);
+  opacity: 0.8;
 }
 
 @media (max-width: 480px) {

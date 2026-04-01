@@ -1,28 +1,29 @@
-import { useEffect, useState } from 'react'
+import { useAuth } from '@/context/AuthContext'
+import { listaDeCampus } from '@/data/campus.js'
+import { listaDeCursos } from '@/data/cursos.js'
+import { authService } from '@/services/authService'
+import { studentService } from '@/services/studentService'
+import {
+  formatBirthDate,
+  formatDocumentId,
+  generateRegistrationId,
+} from '@/utils/formatters'
 import { motion } from 'framer-motion'
 import {
   AlertCircle,
   Calendar,
+  Clock,
   CreditCard,
   GraduationCap,
+  LogOut,
   MapPin,
   Send,
-  Trash2,
   ShieldAlert,
+  Trash2,
   User,
-  LogOut,
 } from 'lucide-react'
-import { useNavigate, Link } from 'react-router-dom'
-import { useAuth } from '@/context/AuthContext'
-import { authService } from '@/services/authService'
-import { listaDeCampus } from '@/data/campus.js'
-import { listaDeCursos } from '@/data/cursos.js'
-import { studentService } from '@/services/studentService'
-import {
-  generateRegistrationId,
-  formatDocumentId,
-  formatBirthDate,
-} from '@/utils/formatters'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import './Form.css'
 
 /**
@@ -111,39 +112,44 @@ function Form() {
     try {
       // NOTE: created_at is intentionally omitted — the database uses DEFAULT NOW()
       const dataToSave = {
-        ...formData,
+        name: formData.name,
+        document_id: formData.document_id,
+        birth_date: formData.birth_date,
+        course: formData.course,
+        campus: formData.campus,
         registration_id: generateRegistrationId().toString(),
         user_id: user.id,
       }
 
       const savedStudent = await studentService.create(dataToSave)
-      
+
       if (!isGold) {
         await authService.promoteToGold(user.id)
         await refreshProfile()
       }
-      
+
       // Redirect to the card visualization page
       navigate(`/card/${savedStudent.id}`)
     } catch (error) {
       console.error('Error saving student:', error)
-      setFormError('Erro ao salvar os dados. Verifique sua conexão e tente novamente.')
+      setFormError(
+        'Erro ao salvar os dados. Verifique sua conexão e tente novamente.'
+      )
     } finally {
       setLoading(false)
     }
   }
 
   const handleReset = () => {
-    if (window.confirm('Limpar todos os campos?')) {
-      setFormData({
-        name: '',
-        document_id: '',
-        birth_date: '',
-        course: '',
-        campus: '',
-      })
-      localStorage.removeItem('unip-card-data')
-    }
+    setFormData({
+      name: '',
+      document_id: '',
+      birth_date: '',
+      course: '',
+      campus: '',
+    })
+    setFormError('')
+    localStorage.removeItem('unip-card-data')
   }
 
   const handleLogout = async () => {
@@ -168,12 +174,10 @@ function Form() {
       <form onSubmit={handleSubmit} className="glass-form">
         <div className="form-header">
           <div className="title-wrapper">
-            <CreditCard className="header-icon" />
+            <CreditCard className="header-icon" size={32} />
             <div>
-              <div className={`status-badge ${isGold ? 'gold' : 'silver'}`}>
-                NÍVEL {isGold ? 'OURO' : 'PRATA'}
-              </div>
-              <h1>Gerador de Carteirinha UNIP</h1>
+              <h1>Credencial Digital</h1>
+              <p>Gere sua credencial digital UNIP.</p>
             </div>
           </div>
           <div className="header-actions">
@@ -183,14 +187,30 @@ function Form() {
               onClick={handleLogout}
               disabled={isLoggingOut}
             >
-              {isLoggingOut ? <span className="loader-spinner"></span> : <><LogOut size={16} /> Sair</>}
+              {isLoggingOut ? (
+                <span className="loader-spinner"></span>
+              ) : (
+                <>
+                  <LogOut size={16} /> Sair
+                </>
+              )}
             </button>
             <Link to="/history" className="link-history">
-              Ver Histórico
+              <Clock size={16} style={{ marginRight: '6px' }} /> Histórico
             </Link>
             {isAdmin && (
-              <Link to="/admin" className="link-history admin-btn" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', borderColor: 'rgba(245, 158, 11, 0.2)' }}>
-                <ShieldAlert size={16} style={{ marginRight: '6px' }} /> Painel Admin
+              <Link
+                to="/admin"
+                className="link-history admin-btn"
+                style={{
+                  background: 'rgba(245, 158, 11, 0.1)',
+                  color: '#f59e0b',
+                  borderColor: 'rgba(245, 158, 11, 0.2)',
+                  padding: '12px 20px',
+                  fontSize: '0.95rem',
+                }}
+              >
+                <ShieldAlert size={16} style={{ marginRight: '6px' }} /> Admin
               </Link>
             )}
           </div>
@@ -215,7 +235,9 @@ function Form() {
             </div>
             <div className="form-row">
               <div className="form-group flex-1">
-                <label htmlFor="document_id">Documento de Identidade (RG)</label>
+                <label htmlFor="document_id">
+                  Documento de Identidade (RG)
+                </label>
                 <div className="input-with-icon">
                   <input
                     type="text"
@@ -318,7 +340,7 @@ function Form() {
               'Salvando...'
             ) : (
               <>
-                <Send size={18} /> Gerar Carteirinha
+                <Send size={18} /> Gerar Credencial
               </>
             )}
           </motion.button>
